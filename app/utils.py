@@ -75,3 +75,33 @@ def clear_db() -> None:
     """Helper for tests (remove all items)."""
     global _DB
     _DB = {}
+from typing import Dict, Optional
+_store: Dict[str, Dict] = {}
+
+def create_item(key: str, value: Dict) -> None:
+    """Store a copy of value under key. Replacing existing value is fine."""
+    _store[key] = value.copy()
+
+def read_item(key: str) -> Optional[Dict]:
+    """Return a copy of the stored dict or None if absent."""
+    if key in _store:
+        return _store[key].copy()
+    return None
+
+def update_item(key: str, patch: Dict) -> bool:
+    """
+    If the key exists, merge patch into the stored dict
+    (existing.update(patch) semantics) and return True.
+    If key missing, return False.
+    """
+    if key in _store:
+        _store[key].update(patch)
+        return True
+    return False
+
+def delete_item(key: str) -> bool:
+    """Delete the key if present; return True if deleted, False otherwise."""
+    if key in _store:
+        del _store[key]
+        return True
+    return False
