@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, make_response
+from flask import request, escape
 from markupsafe import escape
 from . import utils
 
@@ -77,13 +78,12 @@ def item_endpoint(key):
 @app.route("/vulnerable_echo")
 def vulnerable_echo():
     name = request.args.get("name", "")
-    body = f"<h2>Hello {name}</h2>"
-    # attach CSP header correctly to the response object
+    safe_name = escape(name)
+    body = f"<h1>Hello {safe_name}</h1>"
     resp = make_response(body, 200)
     resp.headers["Content-Type"] = "text/html; charset=utf-8"
-    # Content-Security-Policy: disallow inline scripts (blocks <script>...</script>)
     resp.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'"
-    return resp
+
 
 
 # Safe endpoint: escape user input before returning
